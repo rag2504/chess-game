@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Game Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #23273a 60%, #355c7d 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 500px;
+            margin: 60px auto;
+            padding: 36px 30px 32px 30px;
+            background: rgba(25,29,41,0.97);
+            border-radius: 14px;
+            box-shadow: 0 8px 30px #0008;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.45em;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .intro {
+            color: #e0e0e0;
+            font-size: 1.12em;
+            margin-bottom: 24px;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            margin-top: 32px;
+        }
+        .btn {
+            background: #ffd600;
+            color: #23273a;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1.12em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            box-shadow: 0 2px 12px #0003;
+        }
+        .btn:hover {
+            background: #ffb300;
+            color: #fff;
+        }
+        .chess-img {
+            width: 80px;
+            margin-bottom: 18px;
+            filter: drop-shadow(0 2px 12px #0007);
+        }
+        @media (max-width: 600px) {
+            .container {
+                max-width: 95vw;
+                padding: 18px 4vw 24px 4vw;
+            }
+            .btn-group {
+                flex-direction: column;
+                gap: 14px;
+            }
+            .chess-img {
+                width: 54px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/512px-Image_created_with_a_mobile_phone.png" alt="Chess" class="chess-img" />
+        <h1>Welcome to Chess Arena</h1>
+        <div class="intro">
+            <p>
+                Challenge your friends or play against new opponents in a real-time chess experience.<br>
+                Sign up to begin your journey, or login if you already have an account.<br>
+                The game follows all standard chess rules and supports real-time multiplayer action!
+            </p>
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="location.href='login.html'">Login</button>
+            <button class="btn" onclick="location.href='signup.html'">Sign Up</button>
+        </div>
+    </div>
+</body>
+</html>
