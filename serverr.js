@@ -19,11 +19,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// MongoDB
-mongoose.connect('mongodb://localhost:27017/authSystem')
+// Connect to MongoDB
+mongoose.connect('mongodb+srv://rag123456:rag123456@cluster0.qipvo.mongodb.net/authSystem', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
 
+    
 // Schemas
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
