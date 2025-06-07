@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 30px;
+            background: #222;
+            color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 0 10px #0008;
+        }
+        .greeting {
+            font-size: 1.4em;
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+        .players-list {
+            margin-bottom: 25px;
+        }
+        .player-entry {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #333;
+            padding: 12px 18px;
+            border-radius: 7px;
+            margin-bottom: 10px;
+        }
+        .player-name {
+            font-size: 1.12em;
+        }
+        .play-btn {
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .play-btn:disabled {
+            background: #777;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            color: #ffeb3b;
+            font-weight: 500;
+        }
+        .logout {
+            float: right;
+            color: #fff;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.93em;
+        }
+        .me {
+            color: #03a9f4;
+            font-weight: 500;
+        }
+        #incomingRequests {
+            background: #23272e;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            padding: 10px 16px;
+        }
+        #incomingRequests h3 {
+            margin: 0 0 12px 0;
+            color: #ffd600;
+        }
+        .req-btn {
+            margin-left: 10px;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 3px 13px;
+            cursor: pointer;
+        }
+        .req-btn.decline {
+            background: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="logout" onclick="logout()">Logout</span>
+        <div class="greeting" id="greeting"></div>
+        <div id="incomingRequests"></div>
+        <h3>Online Players</h3>
+        <div class="players-list" id="playersList">
+            <!-- Player entries populated by JS -->
+        </div>
+        <div class="status" id="status"></div>
+    </div>
+    <script>
+        function getCurrentMobile() {
+    return localStorage.getItem('currentMobile');
+}
+
+async function fetchPlayers() {
+    const currentMobile = getCurrentMobile();
+    const res = await fetch('/api/players?mobile=' + encodeURIComponent(currentMobile));
+    if (!res.ok) {
+        return [];
+    }
+    const data = await res.json();
+    return data.players
+        .filter(mobile => mobile !== currentMobile)
+        .map(mobile => ({ mobile }));
+}
+
+async function sendGameRequest(toMobile) {
+    const fromMobile = getCurrentMobile();
+    const res = await fetch('/api/send-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: fromMobile, to: toMobile })
+    });
+    if (res.ok) {
+        const data = await res.json();
+        // Store the outgoing request time for polling
+        localStorage.setItem('lastRequestTime', data.createdAt);
+        document.getElementById('status').innerText = `Game request sent to ${toMobile}. Waiting for acceptance...`;
+        // Start polling for accepted game
+        if (!window._gamePollingStarted) {
+            window._gamePollingStarted = true;
+            pollForAcceptedGame();
+        }
+        loadIncomingRequests();
+    } else {
+        document.getElementById('status').innerText = `Failed to send game request.`;
+    }
+}
+
+async function handleRequestAction(requestId, action) {
+    const res = await fetch('/api/request-action', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ requestId, action })
+    });
+    if (res.ok) {
+        if (action === "accept") {
+            const data = await res.json();
+            if (data.gameId) {
+                window.location.href = `game.html?gameId=${data.gameId}`;
+            }
+        } else {
+            loadIncomingRequests();
+        }
+    }
+}
+
+async function loadIncomingRequests() {
+    const mobile = getCurrentMobile();
+    const res = await fetch('/api/incoming-requests?mobile=' + encodeURIComponent(mobile));
+    const requestsDiv = document.getElementById('incomingRequests');
+    requestsDiv.innerHTML = "<h3>Incoming Play Requests</h3>";
+    if (!res.ok) {
+        requestsDiv.innerHTML += "<div style='color:#aaa;'>Unable to load requests.</div>";
+        return;
+    }
+    const data = await res.json();
+    if (data.requests && data.requests.length > 0) {
+        data.requests.forEach(req => {
+            const el = document.createElement('div');
+            el.style.marginBottom = '10px';
+            el.innerHTML = `From: ${req.from} (at ${new Date(req.createdAt).toLocaleTimeString()})`;
+            // Accept button
+            const acceptBtn = document.createElement('button');
+            acceptBtn.textContent = "Accept";
+            acceptBtn.className = "req-btn";
+            acceptBtn.onclick = () => handleRequestAction(req._id, "accept");
+            el.appendChild(acceptBtn);
+            // Decline button
+            const declineBtn = document.createElement('button');
+            declineBtn.textContent = "Decline";
+            declineBtn.className = "req-btn decline";
+            declineBtn.onclick = () => handleRequestAction(req._id, "decline");
+            el.appendChild(declineBtn);
+            requestsDiv.appendChild(el);
+        });
+    } else {
+        requestsDiv.innerHTML += "<div style='color:#aaa;'>No incoming requests.</div>";
+    }
+}
+
+async function populateDashboard() {
+    const mobile = getCurrentMobile();
+    if (!mobile) {
+        window.location.href = "login.html";
+        return;
+    }
+    document.getElementById('greeting').innerHTML = `Hi <span class="me">${mobile}</span> 👋`;
+
+    const players = await fetchPlayers();
+    const listDiv = document.getElementById('playersList');
+    listDiv.innerHTML = "";
+
+    if (players.length === 0) {
+        listDiv.innerHTML = "<div style='text-align:center;color:#aaa;'>No other players found.</div>";
+    } else {
+        players.forEach(player => {
+            const entry = document.createElement('div');
+            entry.className = "player-entry";
+            const name = document.createElement('span');
+            name.className = "player-name";
+            name.textContent = player.mobile;
+            entry.appendChild(name);
+
+            const btn = document.createElement('button');
+            btn.className = "play-btn";
+            btn.textContent = "Send Play Request";
+            btn.onclick = () => sendGameRequest(player.mobile);
+            entry.appendChild(btn);
+
+            listDiv.appendChild(entry);
+        });
+    }
+}
+
+// Only poll for accepted game if a challenge was sent!
+function pollForAcceptedGame() {
+    // Already polling? Prevent duplicate intervals.
+    if (window._gamePollInterval) return;
+    window._gamePollInterval = setInterval(async () => {
+        const mobile = getCurrentMobile();
+        const lastRequestTime = localStorage.getItem('lastRequestTime');
+        if (!lastRequestTime) return;
+        const res = await fetch('/api/my-active-game?mobile=' + encodeURIComponent(mobile) + "&lastRequestTime=" + encodeURIComponent(lastRequestTime));
+        const data = await res.json();
+        if (data.gameId) {
+            localStorage.removeItem('lastRequestTime'); // Avoid redirect loop
+            clearInterval(window._gamePollInterval);
+            window._gamePollInterval = null;
+            window.location.href = "game.html?gameId=" + data.gameId;
+        }
+    }, 2000);
+}
+
+function logout() {
+    localStorage.removeItem('currentMobile');
+    localStorage.removeItem('lastRequestTime');
+    window.location.href = "login.html";
+}
+
+window.onload = function() {
+    populateDashboard();
+    loadIncomingRequests();
+    setInterval(loadIncomingRequests, 10000); // Refresh requests every 10s
+
+    // If the user refreshed after sending a challenge, resume polling
+    if (localStorage.getItem('lastRequestTime')) {
+        pollForAcceptedGame();
+    }
+};
+    </script>
+</body>
+</html>
