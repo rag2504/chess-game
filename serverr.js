@@ -1,21 +1,30 @@
+// === Final server.js with Socket.IO for Real-Time Chess and chess rules enforcement ===
+
 const express = require('express');
+const http = require('http');
 const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
+const socketIo = require('socket.io');
 require('dotenv').config();
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 
+// Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-mongoose.connect('mongodb://localhost:27017/authSystem', { useNewUrlParser: true, useUnifiedTopology: true })
+// MongoDB
+mongoose.connect('mongodb://localhost:27017/authSystem')
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
 
+// Schemas
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     mobile: { type: String, required: true },
@@ -42,6 +51,7 @@ const User = mongoose.model('User', userSchema);
 const Request = mongoose.model('Request', requestSchema);
 const Game = mongoose.model('Game', gameSchema);
 
+// Email
 const EMAIL_USER = 'ragraichura@gmail.com';
 const EMAIL_PASS = 'qgdn nzif cfnn vjax';
 
@@ -54,6 +64,8 @@ const transporter = nodemailer.createTransport({
     debug: true,
     logger: true,
 });
+
+// === AUTH & USER ROUTES ===
 
 app.post('/signup', async (req, res) => {
     const { email, mobile, password } = req.body;
@@ -95,6 +107,8 @@ app.get('/api/players', async (req, res) => {
         res.status(500).json({ message: 'Error loading players' });
     }
 });
+
+// === CHESS GAME ROUTES ===
 
 app.post('/api/send-request', async (req, res) => {
     const { from, to } = req.body;
@@ -142,7 +156,6 @@ app.post('/api/request-action', async (req, res) => {
     }
 });
 
-// Only return a game created after the user's latest outgoing request
 app.get('/api/my-active-game', async (req, res) => {
     const mobile = req.query.mobile;
     const lastRequestTime = req.query.lastRequestTime;
@@ -173,20 +186,42 @@ app.get('/api/game', async (req, res) => {
     });
 });
 
+// Real-time move update for Socket.IO, backend as chess rules authority
 app.post('/api/game-move', async (req, res) => {
-    const { gameId, move } = req.body;
+    const { gameId, from, to, promotion } = req.body;
     const game = await Game.findById(gameId);
-    if (!game) return res.status(404).json({ message: 'Game not found' });
-    const Chess = require('chess.js').Chess;
-    const chess = new Chess(game.fen === "start" ? undefined : game.fen);
-    const result = chess.move(move, { sloppy: true });
-    if (!result) return res.status(400).json({ message: 'Invalid move' });
+    if (!game) return res.status(404).json({ success: false, message: 'Game not found' });
+
+    const { Chess } = require('chess.js');
+    let chess = new Chess(game.fen === "start" ? undefined : game.fen);
+
+    if (!from || !to) {
+        return res.status(400).json({ success: false, message: 'Invalid move data' });
+    }
+
+    const move = { from, to };
+    if (promotion) move.promotion = promotion;
+
+    let result;
+    try {
+        result = chess.move(move);
+    } catch (err) {
+        // Chess.js threw (e.g. move is totally illegal)
+        return res.status(400).json({ success: false, message: 'Illegal move: ' + err.message });
+    }
+    if (!result) return res.status(400).json({ success: false, message: 'Illegal move' });
+
     game.fen = chess.fen();
     game.moves = game.moves || [];
-    game.moves.push(move);
+    game.moves.push(result.san);
     await game.save();
-    res.json({ success: true });
+
+    io.to(gameId).emit('opponentMove', { fen: game.fen, move: result });
+
+    return res.json({ success: true, fen: game.fen, move: result });
 });
+
+// === PASSWORD RESET ROUTES ===
 
 app.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
@@ -239,7 +274,22 @@ app.post('/reset-password', async (req, res) => {
     }
 });
 
+// === SOCKET.IO REAL-TIME LOGIC ===
+
+io.on('connection', (socket) => {
+    // Player joins a game room
+    socket.on('joinGame', (gameId) => {
+        socket.join(gameId);
+    });
+
+    // (Optional) For ping/pong or debugging
+    socket.on('disconnect', () => {
+        // handle user disconnect if needed
+    });
+});
+
+// === START SERVER ===
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

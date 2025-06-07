@@ -39,6 +39,7 @@
             font-size: 1.15em;
             font-weight: 500;
             text-align: center;
+            min-height: 2em;
         }
         .return-btn {
             display: block;
@@ -52,6 +53,11 @@
             cursor: pointer;
             font-weight: 500;
         }
+        .legal-move-list {
+            color: #ffd600;
+            font-size: 0.98em;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -64,10 +70,11 @@
         <div id="status"></div>
         <button class="return-btn" onclick="window.location.href='dashboard.html'">Return to Dashboard</button>
     </div>
-    <!-- ORDER MATTERS: chessboard.js, THEN chess.js -->
-     <script src="/jquery-3.6.0.min.js"></script>
+    <!-- ORDER MATTERS: chessboard.js, THEN chess.js, THEN socket.io -->
+    <script src="/jquery-3.6.0.min.js"></script>
     <script src="/chessboard-1.0.0.min.js"></script>
     <script src="/chess.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         const STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         function getQueryParam(name) {
@@ -77,11 +84,14 @@
         const gameId = getQueryParam('gameId');
         let currentMobile = localStorage.getItem('currentMobile');
         let color = 'white';
+        let chess, board;
+        const socket = io();
 
         async function loadGame() {
             const res = await fetch('/api/game?gameId=' + encodeURIComponent(gameId));
             if (!res.ok) {
                 document.getElementById('status').textContent = 'Game not found or error loading game!';
+                startChess(STARTING_FEN); // fallback to start
                 return;
             }
             const data = await res.json();
@@ -95,71 +105,102 @@
             } else if (data.fen === "start" || !data.fen) {
                 fen = STARTING_FEN;
             }
-            console.log("FEN passed to Chess():", fen);
             startChess(fen);
         }
 
         function startChess(fen) {
-            if (typeof Chess !== "function") {
-                alert("Chess.js did not load. Check your internet connection and the chess.js script version.");
-                return;
-            }
-            let chess;
+            chess = new Chess();
             try {
-                chess = new Chess(fen);
+                chess.load(fen);
             } catch (e) {
-                console.error("Invalid FEN or Chess.js error:", e, fen);
-                document.getElementById('status').textContent = 'Error loading game position. Invalid FEN from server.';
-                return;
+                document.getElementById('status').textContent = 'Error loading game position. Loading start position.';
+                chess = new Chess();
             }
-            var board = ChessBoard('board', {
-                position: chess.fen(),
+
+            board = ChessBoard('board', {
+                position: chess.fen() || 'start',
                 orientation: color,
                 draggable: true,
-                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+                pieceTheme: '/img/chesspieces/wikipedia/{piece}.png',
                 onDrop: async function (source, target) {
+                    // Only allow moves if it's this player's turn
                     if ((chess.turn() === 'w' && color !== 'white') || (chess.turn() === 'b' && color !== 'black')) {
                         return 'snapback';
                     }
-                    const move = chess.move({ from: source, to: target, promotion: 'q' });
-                    if (move === null) return 'snapback';
-                    await fetch('/api/game-move', {
+                    // Only send move info to backend, let backend validate all chess rules
+                    const moveReq = { from: source, to: target, promotion: 'q' };
+                    const response = await fetch('/api/game-move', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ gameId, move: move.san })
+                        body: JSON.stringify({ gameId, ...moveReq })
                     });
-                    board.position(chess.fen());
+                    const data = await response.json();
+
+                    if (!data.success) {
+                        // Show "Wrong move!" and legal moves for piece
+                        let msg = "Wrong move!<br>";
+                        const legalMoves = chess.moves({ square: source, verbose: true });
+                        if (legalMoves && legalMoves.length > 0) {
+                            msg += "<span class='legal-move-list'>Legal moves for this piece: " + 
+                                legalMoves.map(m => m.to).join(', ') + "</span>";
+                        } else {
+                            msg += "<span class='legal-move-list'>This piece cannot move.</span>";
+                        }
+                        document.getElementById('status').innerHTML = msg;
+                        return 'snapback';
+                    }
+
+                    // Update local chess.js and board with backend-validated FEN
+                    chess.load(data.fen);
+                    board.position(data.fen);
                     updateStatus(chess);
                 }
             });
             updateStatus(chess);
-            setInterval(async () => {
-                const res = await fetch('/api/game?gameId=' + encodeURIComponent(gameId));
-                if (!res.ok) return;
-                const data = await res.json();
-                if (typeof data.fen === "string" && data.fen.trim() && data.fen !== chess.fen()) {
+
+            // Join the game room for real-time updates
+            socket.emit('joinGame', gameId);
+
+            // Listen for real-time opponent moves (authoritative FEN from backend)
+            socket.on('opponentMove', ({ fen }) => {
+                if (fen && fen !== chess.fen()) {
                     try {
-                        chess.load(data.fen);
-                        board.position(chess.fen());
+                        chess.load(fen);
+                        board.position(fen);
                         updateStatus(chess);
                     } catch (e) {
-                        // Ignore invalid FEN updates
+                        console.warn("Invalid FEN from opponentMove:", fen);
                     }
                 }
-            }, 2000);
+            });
         }
 
         function updateStatus(chess) {
             let status = '';
             if (chess.in_checkmate()) {
-                status = "Checkmate! " + (chess.turn() === 'w' ? "Black" : "White") + " wins.";
+                // Find king position for the losing side
+                const turn = chess.turn();
+                let kingSquare = null;
+                const boardObj = chess.board();
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        const piece = boardObj[r][c];
+                        if (piece && piece.type === 'k' && piece.color === turn) {
+                            kingSquare = String.fromCharCode('a'.charCodeAt(0) + c) + (8 - r);
+                        }
+                    }
+                }
+                status = "Checkmate! " + (turn === 'w' ? "Black" : "White") + " wins. ";
+                if (kingSquare) {
+                    status += "King on " + kingSquare + " cannot move.";
+                }
             } else if (chess.in_draw()) {
                 status = "Draw!";
             } else {
                 status = (chess.turn() === 'w' ? "White" : "Black") + "'s turn.";
                 if (chess.in_check()) status += " Check!";
             }
-            document.getElementById('status').textContent = status;
+            document.getElementById('status').innerHTML = status;
         }
 
         loadGame();

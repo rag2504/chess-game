@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/chessboard-1.0.0.min.css">
+</head>
+<body>
+  <div id="board" style="width: 400px"></div>
+  <script src="/jquery-3.6.0.min.js"></script>
+  <script src="/chessboard-1.0.0.min.js"></script>
+  <script>
+    var board = ChessBoard('board', {
+      pieceTheme: '/img/chesspieces/wikipedia/{piece}.png',
+      position: 'start'
+    });
+  </script>
+</body>
+</html>
