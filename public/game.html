@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Chess Game</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="/chessboard-1.0.0.min.css">
     <style>
         body {
             background: #1a1b22;
@@ -64,10 +64,12 @@
         <div id="status"></div>
         <button class="return-btn" onclick="window.location.href='dashboard.html'">Return to Dashboard</button>
     </div>
-    <!-- THE ORDER MATTERS! chessboard-js, THEN chess.js 0.13.4 from cdnjs -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.13.4/chess.min.js"></script>
+    <!-- ORDER MATTERS: chessboard.js, THEN chess.js -->
+     <script src="/jquery-3.6.0.min.js"></script>
+    <script src="/chessboard-1.0.0.min.js"></script>
+    <script src="/chess.min.js"></script>
     <script>
+        const STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
@@ -86,7 +88,15 @@
             document.getElementById('whitePlayer').textContent = "White: " + data.playerWhite;
             document.getElementById('blackPlayer').textContent = "Black: " + data.playerBlack;
             color = (data.playerWhite === currentMobile) ? 'white' : 'black';
-            startChess(data.fen);
+
+            let fen;
+            if (typeof data.fen === "string" && data.fen.trim().split(" ").length >= 4) {
+                fen = data.fen;
+            } else if (data.fen === "start" || !data.fen) {
+                fen = STARTING_FEN;
+            }
+            console.log("FEN passed to Chess():", fen);
+            startChess(fen);
         }
 
         function startChess(fen) {
@@ -94,7 +104,14 @@
                 alert("Chess.js did not load. Check your internet connection and the chess.js script version.");
                 return;
             }
-            var chess = new Chess(fen === "start" ? undefined : fen);
+            let chess;
+            try {
+                chess = new Chess(fen);
+            } catch (e) {
+                console.error("Invalid FEN or Chess.js error:", e, fen);
+                document.getElementById('status').textContent = 'Error loading game position. Invalid FEN from server.';
+                return;
+            }
             var board = ChessBoard('board', {
                 position: chess.fen(),
                 orientation: color,
@@ -120,10 +137,14 @@
                 const res = await fetch('/api/game?gameId=' + encodeURIComponent(gameId));
                 if (!res.ok) return;
                 const data = await res.json();
-                if (data.fen && data.fen !== chess.fen()) {
-                    chess.load(data.fen);
-                    board.position(chess.fen());
-                    updateStatus(chess);
+                if (typeof data.fen === "string" && data.fen.trim() && data.fen !== chess.fen()) {
+                    try {
+                        chess.load(data.fen);
+                        board.position(chess.fen());
+                        updateStatus(chess);
+                    } catch (e) {
+                        // Ignore invalid FEN updates
+                    }
                 }
             }, 2000);
         }
