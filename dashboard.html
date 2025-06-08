@@ -3,263 +3,1532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chess Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Chess Arena - Dashboard</title>
     <style>
-        .container {
-            max-width: 700px;
-            margin: 30px auto;
-            padding: 30px;
-            background: #222;
-            color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 0 10px #0008;
+    *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+/* Header */
+.header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.chess-icon {
+    font-size: 2.5rem;
+    background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.greeting {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.logout-btn {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+}
+
+/* Left Panel */
+.main-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Search Section */
+.search-section {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 15px 50px 15px 20px;
+    color: white;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #ffd93d;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 20px rgba(255, 217, 61, 0.3);
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Players Section */
+.players-section {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex: 1;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.online-indicator {
+    width: 12px;
+    height: 12px;
+    background: #4caf50;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+}
+
+.players-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.players-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.players-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.players-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.players-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.player-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.player-card:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1));
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.player-avatar {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.player-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.player-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.player-status {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.new-badge {
+    background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 5px rgba(255, 217, 61, 0.5); }
+    to { box-shadow: 0 0 20px rgba(255, 217, 61, 0.8); }
+}
+
+.challenge-btn {
+    background: linear-gradient(45deg, #4caf50, #45a049);
+    border: none;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.challenge-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.challenge-btn:disabled {
+    background: linear-gradient(45deg, #666, #555);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.challenge-btn.sending {
+    background: linear-gradient(45deg, #ff9800, #f57c00);
+}
+
+.challenge-btn.sending::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Right Panel */
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Incoming Requests */
+.requests-section {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.requests-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.requests-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.notification-badge {
+    background: #ff6b6b;
+    color: white;
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-5px); }
+    60% { transform: translateY(-3px); }
+}
+
+.request-card {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(238, 90, 82, 0.1));
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.request-info {
+    margin-bottom: 15px;
+}
+
+.request-from {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #ffd93d;
+}
+
+.request-time {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-top: 5px;
+}
+
+.request-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.accept-btn {
+    background: linear-gradient(45deg, #4caf50, #45a049);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    flex: 1;
+    transition: all 0.3s ease;
+}
+
+.decline-btn {
+    background: linear-gradient(45deg, #f44336, #d32f2f);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    flex: 1;
+    transition: all 0.3s ease;
+}
+
+.accept-btn:hover, .decline-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Status Section */
+.status-section {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-message {
+    background: rgba(255, 217, 61, 0.1);
+    border: 1px solid rgba(255, 217, 61, 0.3);
+    border-radius: 12px;
+    padding: 15px;
+    color: #ffd93d;
+    font-weight: 500;
+    display: none;
+}
+
+.status-message.show {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-text {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.empty-subtext {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 15px 10px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Mobile Header */
+    .header {
+        padding: 15px 0;
+    }
+
+    .header-content {
+        padding: 0 15px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logo {
+        font-size: 1.4rem;
+        gap: 10px;
+    }
+
+    .chess-icon {
+        font-size: 1.8rem;
+    }
+
+    .user-info {
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .greeting {
+        font-size: 0.9rem;
+        display: none; /* Hide greeting on very small screens */
+    }
+
+    .logout-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    /* Priority order for mobile */
+    .side-panel {
+        order: -1;
+        margin-bottom: 10px;
+    }
+
+    .main-panel {
+        order: 1;
+    }
+
+    /* Enhanced Mobile Challenge Requests Section */
+    .requests-section {
+        position: sticky;
+        top: 70px;
+        z-index: 90;
+        background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(238, 90, 82, 0.1));
+        backdrop-filter: blur(25px);
+        border: 2px solid rgba(255, 107, 107, 0.4);
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 32px rgba(255, 107, 107, 0.25);
+        animation: mobileEnhance 0.5s ease;
+    }
+
+    @keyframes mobileEnhance {
+        from {
+            transform: translateY(-10px);
+            opacity: 0.8;
         }
-        .greeting {
-            font-size: 1.4em;
-            margin-bottom: 18px;
-            font-weight: 500;
+        to {
+            transform: translateY(0);
+            opacity: 1;
         }
-        .players-list {
-            margin-bottom: 25px;
-        }
-        .player-entry {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #333;
-            padding: 12px 18px;
-            border-radius: 7px;
-            margin-bottom: 10px;
-        }
-        .player-name {
-            font-size: 1.12em;
-        }
-        .play-btn {
-            background: #4caf50;
-            color: #fff;
-            border: none;
-            padding: 7px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .play-btn:disabled {
-            background: #777;
-            cursor: not-allowed;
-        }
-        .status {
-            margin-top: 20px;
-            color: #ffeb3b;
-            font-weight: 500;
-        }
-        .logout {
-            float: right;
-            color: #fff;
-            text-decoration: underline;
-            cursor: pointer;
-            font-size: 0.93em;
-        }
-        .me {
-            color: #03a9f4;
-            font-weight: 500;
-        }
-        #incomingRequests {
-            background: #23272e;
-            border-radius: 8px;
-            margin-bottom: 18px;
-            padding: 10px 16px;
-        }
-        #incomingRequests h3 {
-            margin: 0 0 12px 0;
-            color: #ffd600;
-        }
-        .req-btn {
-            margin-left: 10px;
-            background: #1976d2;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 3px 13px;
-            cursor: pointer;
-        }
-        .req-btn.decline {
-            background: #b71c1c;
-        }
+    }
+
+    .requests-header {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 107, 107, 0.2);
+    }
+
+    .requests-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ffd93d;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .notification-badge {
+        background: linear-gradient(45deg, #ff4757, #ff3742);
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+        animation: mobilePulse 1.5s infinite;
+    }
+
+    @keyframes mobilePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .request-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
+        border: 1px solid rgba(255, 107, 107, 0.4);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        backdrop-filter: blur(15px);
+        box-shadow: 0 4px 16px rgba(255, 107, 107, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .request-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.25);
+    }
+
+    .request-info {
+        margin-bottom: 14px;
+        text-align: center;
+    }
+
+    .request-from {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(45deg, #ffd93d, #ffed4e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 4px;
+    }
+
+    .request-time {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .request-actions {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .accept-btn, .decline-btn {
+        flex: 1;
+        padding: 12px 16px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 25px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .accept-btn {
+        background: linear-gradient(45deg, #2ed573, #1dd1a1);
+        box-shadow: 0 4px 15px rgba(46, 213, 115, 0.3);
+    }
+
+    .accept-btn:hover, .accept-btn:active {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(46, 213, 115, 0.4);
+    }
+
+    .decline-btn {
+        background: linear-gradient(45deg, #ff4757, #ff3742);
+        box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+    }
+
+    .decline-btn:hover, .decline-btn:active {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+    }
+
+    /* Enhanced Mobile Activity Status Section */
+    .status-section {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        padding: 18px;
+        margin-top: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #ffd93d;
+        text-align: center;
+    }
+
+    .status-message {
+        background: linear-gradient(135deg, rgba(255, 217, 61, 0.15), rgba(255, 217, 61, 0.05));
+        border: 1px solid rgba(255, 217, 61, 0.4);
+        border-radius: 10px;
+        padding: 12px;
+        color: #ffd93d;
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .empty-state {
+        padding: 20px 15px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        opacity: 0.6;
+    }
+
+    .empty-text {
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+
+    .empty-subtext {
+        font-size: 0.8rem;
+        opacity: 0.7;
+    }
+
+    /* Search Section Mobile */
+    .search-section {
+        padding: 18px;
+        border-radius: 16px;
+        margin-bottom: 15px;
+    }
+
+    .search-input {
+        font-size: 1rem;
+        padding: 12px 40px 12px 16px;
+        border-radius: 12px;
+    }
+
+    .search-icon {
+        font-size: 1.1rem;
+        right: 12px;
+    }
+
+    /* Players Section Mobile */
+    .players-section {
+        padding: 18px;
+        border-radius: 16px;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+    }
+
+    .players-count {
+        font-size: 0.85rem;
+        padding: 4px 10px;
+    }
+
+    .player-card {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .player-info {
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .player-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+
+    .player-name {
+        font-size: 1rem;
+    }
+
+    .challenge-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 25px;
+    }
+}
+
+/* Extra Small Mobile Devices */
+@media (max-width: 480px) {
+    .container {
+        padding: 10px 8px;
+        gap: 12px;
+    }
+
+    .header {
+        padding: 12px 0;
+    }
+
+    .header-content {
+        padding: 0 12px;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+        gap: 8px;
+    }
+
+    .chess-icon {
+        font-size: 1.6rem;
+    }
+
+    .user-info .greeting {
+        display: none;
+    }
+
+    .logout-btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* Extra compact requests for very small screens */
+    .requests-section {
+        top: 60px;
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .requests-title {
+        font-size: 1rem;
+    }
+
+    .request-card {
+        padding: 14px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+    }
+
+    .request-from {
+        font-size: 1rem;
+    }
+
+    .request-time {
+        font-size: 0.75rem;
+    }
+
+    .accept-btn, .decline-btn {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        border-radius: 20px;
+    }
+
+    .status-section {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .status-title {
+        font-size: 1rem;
+    }
+
+    .search-section, .players-section {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .search-input {
+        padding: 10px 35px 10px 14px;
+        font-size: 0.95rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+    }
+
+    .empty-state {
+        padding: 16px 12px;
+    }
+
+    .empty-icon {
+        font-size: 2rem;
+    }
+
+    .empty-text {
+        font-size: 0.9rem;
+    }
+
+    .empty-subtext {
+        font-size: 0.75rem;
+    }
+}
+
+/* Tablet Landscape Mode */
+@media (min-width: 481px) and (max-width: 768px) {
+    .requests-section {
+        position: sticky;
+        top: 85px;
+        z-index: 85;
+        background: linear-gradient(135deg, rgba(255, 107, 107, 0.12), rgba(238, 90, 82, 0.08));
+        border: 2px solid rgba(255, 107, 107, 0.35);
+        box-shadow: 0 6px 25px rgba(255, 107, 107, 0.2);
+    }
+
+    .container {
+        padding: 20px 16px;
+        gap: 18px;
+    }
+
+    .search-section, .players-section, .requests-section, .status-section {
+        padding: 22px;
+        border-radius: 18px;
+    }
+
+    .requests-title {
+        font-size: 1.15rem;
+    }
+
+    .request-card {
+        padding: 18px;
+    }
+
+    .accept-btn, .decline-btn {
+        padding: 11px 18px;
+        font-size: 0.92rem;
+    }
+}
     </style>
 </head>
 <body>
-    <div class="container">
-        <span class="logout" onclick="logout()">Logout</span>
-        <div class="greeting" id="greeting"></div>
-        <div id="incomingRequests"></div>
-        <h3>Online Players</h3>
-        <div class="players-list" id="playersList">
-            <!-- Player entries populated by JS -->
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="chess-icon">♛</span>
+                <span>Chess Arena</span>
+            </div>
+            <div class="user-info">
+                <div class="greeting" id="greeting">Welcome back!</div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
         </div>
-        <div class="status" id="status"></div>
     </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Left Panel -->
+        <div class="main-panel">
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="Search players by mobile number..."
+                    >
+                    <div class="search-icon">🔍</div>
+                </div>
+            </div>
+
+            <!-- Players Section -->
+            <div class="players-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="online-indicator"></span>
+                        Online Players
+                    </div>
+                    <div class="players-count" id="playersCount">0 players</div>
+                </div>
+                <div class="players-list" id="playersList">
+                    <!-- Players will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="side-panel">
+            <!-- Incoming Requests -->
+            <div class="requests-section">
+                <div class="requests-header">
+                    <div class="requests-title">⚡ Challenge Requests</div>
+                    <div class="notification-badge" id="requestsBadge" style="display: none;">0</div>
+                </div>
+                <div id="incomingRequests">
+                    <!-- Requests will be populated here -->
+                </div>
+            </div>
+
+            <!-- Status Section -->
+            <div class="status-section">
+                <div class="status-title">
+                    📊 Activity Status
+                </div>
+                <div class="status-message" id="statusMessage"></div>
+                <div id="defaultStatus" class="empty-state">
+                    <div class="empty-icon">🎯</div>
+                    <div class="empty-text">Ready to Play!</div>
+                    <div class="empty-subtext">Challenge someone to start a game</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        function getCurrentMobile() {
-    return localStorage.getItem('currentMobile');
+       // Initialize Socket.IO for real-time updates
+const socket = io();
+let allPlayers = [];
+let requestPollInterval;
+
+function getCurrentMobile() {
+    const mobile = localStorage.getItem('currentMobile');
+    if (!mobile) {
+        // Redirect to login if no mobile found
+        window.location.href = 'login.html';
+        return null;
+    }
+    return mobile;
+}
+
+function getInitials(mobile) {
+    if (!mobile || mobile.length < 2) return 'XX';
+    return mobile.slice(-2).toUpperCase();
+}
+
+function formatTimeAgo(date) {
+    const now = new Date();
+    const diff = now - new Date(date);
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return new Date(date).toLocaleDateString();
+}
+
+function isNewPlayer(createdAt) {
+    if (!createdAt) return false;
+    const now = new Date();
+    const created = new Date(createdAt);
+    const daysDiff = (now - created) / (1000 * 60 * 60 * 24);
+    return daysDiff <= 3; // Consider new if registered within 3 days
+}
+
+function showStatus(message, type = 'info') {
+    const statusMessage = document.getElementById('statusMessage');
+    const defaultStatus = document.getElementById('defaultStatus');
+    
+    if (!statusMessage || !defaultStatus) return;
+    
+    statusMessage.textContent = message;
+    statusMessage.className = `status-message show ${type}`;
+    defaultStatus.style.display = 'none';
+    
+    setTimeout(() => {
+        statusMessage.classList.remove('show');
+        setTimeout(() => {
+            defaultStatus.style.display = 'block';
+        }, 300);
+    }, 5000);
 }
 
 async function fetchPlayers() {
-    const currentMobile = getCurrentMobile();
-    const res = await fetch('/api/players?mobile=' + encodeURIComponent(currentMobile));
-    if (!res.ok) {
+    try {
+        const currentMobile = getCurrentMobile();
+        if (!currentMobile) return [];
+        
+        console.log('Fetching players for mobile:', currentMobile); // Debug log
+        
+        const res = await fetch('/api/players?mobile=' + encodeURIComponent(currentMobile));
+        
+        console.log('API Response status:', res.status); // Debug log
+        
+        if (!res.ok) {
+            console.error('Failed to fetch players:', res.status, res.statusText);
+            showStatus('Failed to load players', 'error');
+            return [];
+        }
+        
+        const data = await res.json();
+        console.log('Players data received:', data); // Debug log
+        
+        // Handle different possible API response formats
+        let playersList = [];
+        if (Array.isArray(data)) {
+            playersList = data;
+        } else if (data.players && Array.isArray(data.players)) {
+            playersList = data.players;
+        } else if (data.success && data.players && Array.isArray(data.players)) {
+            playersList = data.players;
+        } else {
+            console.error('Unexpected API response format:', data);
+            showStatus('Invalid response format from server', 'error');
+            return [];
+        }
+        
+        // Filter out current user and format players
+        allPlayers = playersList
+            .filter(player => {
+                // Handle both string mobile numbers and objects with mobile property
+                const mobile = typeof player === 'string' ? player : player.mobile;
+                return mobile && mobile !== currentMobile;
+            })
+            .map(player => {
+                if (typeof player === 'string') {
+                    return {
+                        mobile: player,
+                        createdAt: new Date() // Default creation date
+                    };
+                } else {
+                    return {
+                        mobile: player.mobile || player.id || player._id,
+                        createdAt: player.createdAt || player.created_at || new Date()
+                    };
+                }
+            })
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        console.log('Processed players:', allPlayers); // Debug log
+        return allPlayers;
+        
+    } catch (error) {
+        console.error('Error fetching players:', error);
+        showStatus('Network error while loading players', 'error');
         return [];
     }
-    const data = await res.json();
-    return data.players
-        .filter(mobile => mobile !== currentMobile)
-        .map(mobile => ({ mobile }));
 }
 
-async function sendGameRequest(toMobile) {
+function filterPlayers(searchTerm) {
+    if (!searchTerm) return allPlayers;
+    return allPlayers.filter(player => 
+        player.mobile && player.mobile.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+}
+
+function renderPlayers(players = allPlayers) {
+    const listDiv = document.getElementById('playersList');
+    const countDiv = document.getElementById('playersCount');
+    
+    if (!listDiv || !countDiv) {
+        console.error('Required DOM elements not found');
+        return;
+    }
+    
+    countDiv.textContent = `${players.length} player${players.length !== 1 ? 's' : ''}`;
+    
+    if (players.length === 0) {
+        listDiv.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">👥</div>
+                <div class="empty-text">No players found</div>
+                <div class="empty-subtext">Try adjusting your search or check back later</div>
+            </div>
+        `;
+        return;
+    }
+
+    listDiv.innerHTML = players.map(player => `
+        <div class="player-card">
+            <div class="player-info">
+                <div class="player-avatar">${getInitials(player.mobile)}</div>
+                <div class="player-details">
+                    <div class="player-name">${player.mobile}</div>
+                    <div class="player-status">
+                        <span>●</span> Online
+                        ${isNewPlayer(player.createdAt) ? '<span class="new-badge">NEW</span>' : ''}
+                    </div>
+                </div>
+            </div>
+            <button class="challenge-btn" onclick="sendGameRequest('${player.mobile}', this)">
+                Challenge
+            </button>
+        </div>
+    `).join('');
+}
+
+async function sendGameRequest(toMobile, button) {
     const fromMobile = getCurrentMobile();
-    const res = await fetch('/api/send-request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: fromMobile, to: toMobile })
-    });
-    if (res.ok) {
-        const data = await res.json();
-        // Store the outgoing request time for polling
-        localStorage.setItem('lastRequestTime', data.createdAt);
-        document.getElementById('status').innerText = `Game request sent to ${toMobile}. Waiting for acceptance...`;
-        // Start polling for accepted game
-        if (!window._gamePollingStarted) {
-            window._gamePollingStarted = true;
-            pollForAcceptedGame();
+    if (!fromMobile) return;
+    
+    // Update button state
+    button.classList.add('sending');
+    button.textContent = 'Sending...';
+    button.disabled = true;
+    
+    try {
+        const res = await fetch('/api/send-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: fromMobile, to: toMobile })
+        });
+        
+        if (res.ok) {
+            const data = await res.json();
+            if (data.createdAt) {
+                localStorage.setItem('lastRequestTime', data.createdAt);
+            }
+            
+            button.textContent = 'Sent!';
+            showStatus(`Challenge sent to ${toMobile}. Waiting for response...`, 'info');
+            
+            // Start polling for game acceptance
+            if (!window._gamePollingStarted) {
+                window._gamePollingStarted = true;
+                pollForAcceptedGame();
+            }
+            
+            // Reset button after delay
+            setTimeout(() => {
+                button.classList.remove('sending');
+                button.textContent = 'Challenge';
+                button.disabled = false;
+            }, 3000);
+        } else {
+            throw new Error('Failed to send request');
         }
-        loadIncomingRequests();
-    } else {
-        document.getElementById('status').innerText = `Failed to send game request.`;
+    } catch (error) {
+        console.error('Error sending game request:', error);
+        button.classList.remove('sending');
+        button.textContent = 'Failed';
+        button.disabled = false;
+        showStatus('Failed to send challenge request', 'error');
+        
+        setTimeout(() => {
+            button.textContent = 'Challenge';
+        }, 2000);
     }
 }
 
-async function handleRequestAction(requestId, action) {
-    const res = await fetch('/api/request-action', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ requestId, action })
-    });
-    if (res.ok) {
-        if (action === "accept") {
-            const data = await res.json();
-            if (data.gameId) {
-                window.location.href = `game.html?gameId=${data.gameId}`;
+async function handleRequestAction(requestId, action, requestCard) {
+    try {
+        const res = await fetch('/api/request-action', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ requestId, action })
+        });
+        
+        if (res.ok) {
+            if (action === "accept") {
+                const data = await res.json();
+                if (data.gameId) {
+                    showStatus('Challenge accepted! Starting game...', 'success');
+                    setTimeout(() => {
+                        window.location.href = `game.html?gameId=${data.gameId}`;
+                    }, 1500);
+                }
+            } else {
+                requestCard.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    requestCard.remove();
+                    updateRequestsBadge();
+                }, 300);
+                showStatus('Challenge declined', 'info');
             }
+        }
+    } catch (error) {
+        console.error('Error handling request action:', error);
+        showStatus('Error processing request', 'error');
+    }
+}
+
+function updateRequestsBadge() {
+    const requests = document.querySelectorAll('.request-card');
+    const badge = document.getElementById('requestsBadge');
+    
+    if (badge) {
+        if (requests.length > 0) {
+            badge.textContent = requests.length;
+            badge.style.display = 'block';
         } else {
-            loadIncomingRequests();
+            badge.style.display = 'none';
         }
     }
 }
 
 async function loadIncomingRequests() {
-    const mobile = getCurrentMobile();
-    const res = await fetch('/api/incoming-requests?mobile=' + encodeURIComponent(mobile));
-    const requestsDiv = document.getElementById('incomingRequests');
-    requestsDiv.innerHTML = "<h3>Incoming Play Requests</h3>";
-    if (!res.ok) {
-        requestsDiv.innerHTML += "<div style='color:#aaa;'>Unable to load requests.</div>";
-        return;
-    }
-    const data = await res.json();
-    if (data.requests && data.requests.length > 0) {
-        data.requests.forEach(req => {
-            const el = document.createElement('div');
-            el.style.marginBottom = '10px';
-            el.innerHTML = `From: ${req.from} (at ${new Date(req.createdAt).toLocaleTimeString()})`;
-            // Accept button
-            const acceptBtn = document.createElement('button');
-            acceptBtn.textContent = "Accept";
-            acceptBtn.className = "req-btn";
-            acceptBtn.onclick = () => handleRequestAction(req._id, "accept");
-            el.appendChild(acceptBtn);
-            // Decline button
-            const declineBtn = document.createElement('button');
-            declineBtn.textContent = "Decline";
-            declineBtn.className = "req-btn decline";
-            declineBtn.onclick = () => handleRequestAction(req._id, "decline");
-            el.appendChild(declineBtn);
-            requestsDiv.appendChild(el);
-        });
-    } else {
-        requestsDiv.innerHTML += "<div style='color:#aaa;'>No incoming requests.</div>";
-    }
-}
-
-async function populateDashboard() {
-    const mobile = getCurrentMobile();
-    if (!mobile) {
-        window.location.href = "login.html";
-        return;
-    }
-    document.getElementById('greeting').innerHTML = `Hi <span class="me">${mobile}</span> 👋`;
-
-    const players = await fetchPlayers();
-    const listDiv = document.getElementById('playersList');
-    listDiv.innerHTML = "";
-
-    if (players.length === 0) {
-        listDiv.innerHTML = "<div style='text-align:center;color:#aaa;'>No other players found.</div>";
-    } else {
-        players.forEach(player => {
-            const entry = document.createElement('div');
-            entry.className = "player-entry";
-            const name = document.createElement('span');
-            name.className = "player-name";
-            name.textContent = player.mobile;
-            entry.appendChild(name);
-
-            const btn = document.createElement('button');
-            btn.className = "play-btn";
-            btn.textContent = "Send Play Request";
-            btn.onclick = () => sendGameRequest(player.mobile);
-            entry.appendChild(btn);
-
-            listDiv.appendChild(entry);
-        });
+    try {
+        const mobile = getCurrentMobile();
+        if (!mobile) return;
+        
+        const res = await fetch('/api/incoming-requests?mobile=' + encodeURIComponent(mobile));
+        const requestsDiv = document.getElementById('incomingRequests');
+        
+        if (!requestsDiv) return;
+        
+        if (!res.ok) {
+            requestsDiv.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">⚠️</div>
+                    <div class="empty-text">Unable to load requests</div>
+                </div>
+            `;
+            return;
+        }
+        
+        const data = await res.json();
+        
+        if (data.requests && data.requests.length > 0) {
+            requestsDiv.innerHTML = data.requests.map(req => `
+                <div class="request-card" data-request-id="${req._id}">
+                    <div class="request-info">
+                        <div class="request-from">${req.from}</div>
+                        <div class="request-time">${formatTimeAgo(req.createdAt)}</div>
+                    </div>
+                    <div class="request-actions">
+                        <button class="accept-btn" onclick="handleRequestAction('${req._id}', 'accept', this.closest('.request-card'))">
+                            Accept
+                        </button>
+                        <button class="decline-btn" onclick="handleRequestAction('${req._id}', 'decline', this.closest('.request-card'))">
+                            Decline
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            requestsDiv.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📬</div>
+                    <div class="empty-text">No pending requests</div>
+                    <div class="empty-subtext">Challenges will appear here</div>
+                </div>
+            `;
+        }
+        
+        updateRequestsBadge();
+    } catch (error) {
+        console.error('Error loading requests:', error);
+        const requestsDiv = document.getElementById('incomingRequests');
+        if (requestsDiv) {
+            requestsDiv.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">⚠️</div>
+                    <div class="empty-text">Error loading requests</div>
+                </div>
+            `;
+        }
     }
 }
 
-// Only poll for accepted game if a challenge was sent!
 function pollForAcceptedGame() {
-    // Already polling? Prevent duplicate intervals.
     if (window._gamePollInterval) return;
+    
     window._gamePollInterval = setInterval(async () => {
         const mobile = getCurrentMobile();
         const lastRequestTime = localStorage.getItem('lastRequestTime');
-        if (!lastRequestTime) return;
-        const res = await fetch('/api/my-active-game?mobile=' + encodeURIComponent(mobile) + "&lastRequestTime=" + encodeURIComponent(lastRequestTime));
-        const data = await res.json();
-        if (data.gameId) {
-            localStorage.removeItem('lastRequestTime'); // Avoid redirect loop
-            clearInterval(window._gamePollInterval);
-            window._gamePollInterval = null;
-            window.location.href = "game.html?gameId=" + data.gameId;
+        if (!mobile || !lastRequestTime) return;
+        
+        try {
+            const res = await fetch(`/api/my-active-game?mobile=${encodeURIComponent(mobile)}&lastRequestTime=${encodeURIComponent(lastRequestTime)}`);
+            const data = await res.json();
+            
+            if (data.gameId) {
+                localStorage.removeItem('lastRequestTime');
+                clearInterval(window._gamePollInterval);
+                window._gamePollInterval = null;
+                window._gamePollingStarted = false;
+                
+                showStatus('Game found! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = "game.html?gameId=" + data.gameId;
+                }, 1500);
+            }
+        } catch (error) {
+            console.error('Error polling for game:', error);
         }
-    }, 2000);
+    }, 5000);
 }
 
 function logout() {
     localStorage.removeItem('currentMobile');
     localStorage.removeItem('lastRequestTime');
-    window.location.href = "login.html";
+    if (window._gamePollInterval) {
+        clearInterval(window._gamePollInterval);
+        window._gamePollInterval = null;
+    }
+    window.location.href = 'login.html';
 }
 
-window.onload = function() {
-    populateDashboard();
-    loadIncomingRequests();
-    setInterval(loadIncomingRequests, 10000); // Refresh requests every 10s
-
-    // If the user refreshed after sending a challenge, resume polling
-    if (localStorage.getItem('lastRequestTime')) {
-        pollForAcceptedGame();
+// Initialize search functionality
+function initializeSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            const filteredPlayers = filterPlayers(searchTerm);
+            renderPlayers(filteredPlayers);
+        });
+        
+        // Clear search on escape
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.target.value = '';
+                renderPlayers(allPlayers);
+            }
+        });
     }
-};
+}
+
+// Socket.IO event listeners
+function initializeSocketEvents() {
+    socket.on('connect', () => {
+        console.log('Connected to server');
+        const mobile = getCurrentMobile();
+        if (mobile) {
+            socket.emit('join', mobile);
+        }
+    });
+    
+    socket.on('playerJoined', (data) => {
+        console.log('Player joined:', data);
+        loadDashboardData(); // Refresh player list
+    });
+    
+    socket.on('playerLeft', (data) => {
+        console.log('Player left:', data);
+        loadDashboardData(); // Refresh player list
+    });
+    
+    socket.on('newRequest', (data) => {
+        console.log('New request received:', data);
+        loadIncomingRequests(); // Refresh requests
+        showStatus(`New challenge from ${data.from}!`, 'info');
+    });
+    
+    socket.on('gameStarted', (data) => {
+        console.log('Game started:', data);
+        showStatus('Game starting...', 'success');
+        setTimeout(() => {
+            window.location.href = `game.html?gameId=${data.gameId}`;
+        }, 1500);
+    });
+}
+
+// Load all dashboard data
+async function loadDashboardData() {
+    try {
+        showStatus('Loading players...', 'info');
+        
+        const players = await fetchPlayers();
+        renderPlayers(players);
+        
+        await loadIncomingRequests();
+        
+        if (players.length > 0) {
+            showStatus('Players loaded successfully!', 'success');
+        } else {
+            showStatus('No other players online', 'info');
+        }
+        
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        showStatus('Error loading dashboard data', 'error');
+    }
+}
+
+// Set up greeting
+function setupGreeting() {
+    const mobile = getCurrentMobile();
+    const greetingEl = document.getElementById('greeting');
+    if (greetingEl && mobile) {
+        greetingEl.textContent = `Welcome, ${mobile}!`;
+    }
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Dashboard initializing...');
+    
+    // Check if user is logged in
+    const mobile = getCurrentMobile();
+    if (!mobile) {
+        return; // Will redirect to login
+    }
+    
+    setupGreeting();
+    initializeSearch();
+    initializeSocketEvents();
+    loadDashboardData();
+    
+    // Refresh data periodically
+    setInterval(loadDashboardData, 30000); // Every 30 seconds
+});
+
+// Handle page visibility changes
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        // Page became visible, refresh data
+        loadDashboardData();
+    }
+});
+
+// Handle beforeunload event
+window.addEventListener('beforeunload', () => {
+    if (window._gamePollInterval) {
+        clearInterval(window._gamePollInterval);
+        window._gamePollInterval = null;
+    }
+});
+    // Leave socket room
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+    }); 
+    
     </script>
 </body>
 </html>

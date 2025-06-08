@@ -3,84 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Login - Chess Game</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
         .container {
-            max-width: 400px;
-            margin: 40px auto;
-            padding: 32px 28px;
-            background: #222;
-            color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #0006;
-        }
-        h2 { text-align: center; margin-bottom: 20px; }
-        form > div { margin-bottom: 17px; }
-        label { display: block; margin-bottom: 6px; }
-        input[type="email"], input[type="password"] {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             width: 100%;
-            padding: 8px 10px;
-            border-radius: 5px;
-            border: 1px solid #444;
-            background: #333;
-            color: #fff;
+            max-width: 420px;
+            position: relative;
+            overflow: hidden;
         }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+
+        .chess-icon {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input[type="email"], 
+        input[type="password"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input[type="email"]:focus, 
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
         button[type="submit"] {
             width: 100%;
-            background: #4caf50;
-            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
-            padding: 10px 0;
-            border-radius: 6px;
-            font-size: 1.1em;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
             margin-top: 10px;
         }
+
         button[type="submit"]:hover {
-            background: #388e3c;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
         }
-        p { text-align: center; margin: 12px 0 0 0; }
-        a { color: #90caf9; text-decoration: none; }
+
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .links p {
+            margin: 10px 0;
+            color: #666;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .links a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
         .error-message {
-            background: #ff5252;
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             text-align: center;
             display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .loading button {
+            position: relative;
+        }
+
+        .loading button::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Login</h2>
+        <div class="chess-icon">♚</div>
+        <h2>Welcome Back</h2>
         <div class="error-message" id="errorMsg"></div>
         <form id="loginForm" autocomplete="on">
-            <div>
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required autocomplete="username">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required autocomplete="username" placeholder="Enter your email">
             </div>
-            <div>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password">
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter your password">
             </div>
-            <button type="submit">Login</button>
+            <button type="submit">Sign In</button>
         </form>
-        <p><a href="forgot-password.html">Forgot Password?</a></p>
-        <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
+        <div class="links">
+            <p><a href="forgot-password.html">Forgot your password?</a></p>
+            <p>Don't have an account? <a href="signup.html">Create one here</a></p>
+        </div>
     </div>
+
     <script>
         document.getElementById('loginForm').onsubmit = async function(e) {
             e.preventDefault();
+            
+            const form = this;
             const errorMsg = document.getElementById('errorMsg');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            // Reset error message
             errorMsg.style.display = 'none';
             errorMsg.textContent = '';
+            
+            // Add loading state
+            form.classList.add('loading');
+            submitBtn.textContent = '';
+            
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
 
-            // Send login request to backend
             try {
                 const res = await fetch('/login', {
                     method: 'POST',
@@ -94,15 +254,26 @@
                     if (data.mobile) {
                         localStorage.setItem('currentMobile', data.mobile);
                     }
-                    // Redirect to dashboard
-                    window.location.href = 'dashboard.html';
+                    
+                    // Success animation
+                    submitBtn.textContent = '✓ Success!';
+                    submitBtn.style.background = 'linear-gradient(135deg, #00b894, #00a085)';
+                    
+                    // Redirect after short delay
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
                 } else {
-                    errorMsg.textContent = data.message || 'Invalid email or password.';
-                    errorMsg.style.display = 'block';
+                    throw new Error(data.message || 'Invalid email or password.');
                 }
             } catch (err) {
-                errorMsg.textContent = 'Server error. Please try again later.';
+                errorMsg.textContent = err.message || 'Server error. Please try again later.';
                 errorMsg.style.display = 'block';
+                
+                // Reset form state
+                form.classList.remove('loading');
+                submitBtn.textContent = 'Sign In';
+                submitBtn.style.background = '';
             }
         };
     </script>
