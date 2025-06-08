@@ -19,6 +19,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+
+
 // Connect to MongoDB
 mongoose.connect('mongodb+srv://rag123456:rag123456@cluster0.qipvo.mongodb.net/authSystem', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
@@ -53,8 +55,8 @@ const Request = mongoose.model('Request', requestSchema);
 const Game = mongoose.model('Game', gameSchema);
 
 // Email
-const EMAIL_USER = 'ragraichura@gmail.com';
-const EMAIL_PASS = 'qgdn nzif cfnn vjax';
+const EMAIL_USER = 'ragraichura3@gmail.com';
+const EMAIL_PASS = 'rbzp dtyc tvtf vaui';
 
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
