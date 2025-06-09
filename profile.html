@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>My Profile | Chess Arena</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Segoe+UI:400,600,700&display=swap">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: #fff;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .profile-container {
+      max-width: 800px;
+      margin: 36px auto 0;
+      background: rgba(255,255,255,0.11);
+      border-radius: 22px;
+      box-shadow: 0 8px 40px rgba(30,60,114,0.18);
+      padding: 36px 30px 40px 30px;
+      backdrop-filter: blur(10px);
+    }
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      margin-bottom: 18px;
+    }
+    .profile-avatar {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #667eea, #ffd93d);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.7rem;
+      font-weight: 700;
+      color: #222;
+      box-shadow: 0 2px 18px rgba(102, 126, 234, 0.12);
+      border: 3px solid #fff;
+    }
+    .profile-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .profile-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #ffd93d;
+    }
+    .profile-email {
+      font-size: 1.08rem;
+      color: #fff;
+      opacity: 0.92;
+      margin-bottom: 2px;
+    }
+    .profile-id {
+      font-size: 0.99rem;
+      color: #ffd93d;
+      opacity: 0.68;
+      margin-bottom: 4px;
+    }
+    .profile-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .profile-btn {
+      background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+      color: #222;
+      border: none;
+      border-radius: 15px;
+      padding: 8px 22px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.18s;
+      box-shadow: 0 2px 8px rgba(255, 107, 107, 0.13);
+    }
+    .profile-btn:hover {
+      background: linear-gradient(45deg, #ffd93d, #ff6b6b);
+      transform: translateY(-2px) scale(1.02);
+    }
+    .section {
+      background: rgba(255,255,255,0.11);
+      border-radius: 16px;
+      padding: 22px 24px 18px 24px;
+      margin-top: 25px;
+      box-shadow: 0 2px 14px rgba(46, 80, 170, 0.1);
+    }
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffd93d;
+      margin-bottom: 15px;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .history-list, .wallet-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      color: #fff;
+    }
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+    }
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    .history-vs {
+      font-weight: 600;
+      color: #ffd93d;
+    }
+    .history-date {
+      font-size: 0.98rem;
+      opacity: 0.7;
+    }
+    .history-result.win {
+      color: #4caf50;
+      font-weight: 600;
+    }
+    .history-result.lose {
+      color: #ff6b6b;
+      font-weight: 600;
+    }
+    .history-result.draw {
+      color: #ffd93d;
+      font-weight: 600;
+    }
+    .wallet-balance {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffd93d;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    .wallet-list {
+      margin-top: 12px;
+    }
+    .wallet-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      font-size: 1.04rem;
+    }
+    .wallet-item.deposit {
+      color: #4caf50;
+    }
+    .wallet-item.withdraw {
+      color: #ff6b6b;
+    }
+    .wallet-item.bonus {
+      color: #ffd93d;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 8px;
+    }
+    .stat-card {
+      background: linear-gradient(45deg, #ffd93d 40%, #ff6b6b 100%);
+      color: #222;
+      border-radius: 13px;
+      padding: 22px 0 14px 0;
+      box-shadow: 0 2px 10px rgba(255, 217, 61, 0.13);
+      text-align: center;
+      font-weight: 600;
+    }
+    .stat-value {
+      font-size: 1.48rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 1.01rem;
+    }
+    @media (max-width: 600px) {
+      .profile-container {
+        padding: 10px 3vw 20px 3vw;
+      }
+      .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .profile-avatar {
+        width: 58px;
+        height: 58px;
+        font-size: 1.5rem;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .section {
+        padding: 14px 5vw 10px 5vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">CP</div>
+      <div class="profile-details">
+        <div class="profile-name" id="profileName">Rag </div>
+        <div class="profile-email" id="profileEmail">rag@example.com</div>
+        <div class="profile-id" id="profileID">ID: 2211-CP-9999</div>
+        <div class="profile-actions">
+          <button class="profile-btn" onclick="editProfile()">Edit Profile</button>
+          <button class="profile-btn" onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
+        </div>
+      </div>
+    </div>
+    <!-- Stats -->
+    <div class="section">
+      <div class="section-title">📊 Quick Stats</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="gamesPlayed">27</div>
+          <div class="stat-label">Games Played</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="gamesWon">15</div>
+          <div class="stat-label">Wins</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="winRate">56%</div>
+          <div class="stat-label">Win Rate</div>
+        </div>
+      </div>
+    </div>
+    <!-- Game History -->
+    <div class="section">
+      <div class="section-title">🎮 Game History</div>
+      <ul class="history-list" id="gameHistoryList">
+        <li class="history-item">
+          <span class="history-vs">Vs rag2504</span>
+          <span class="history-date">2025-06-08</span>
+          <span class="history-result win">Win</span>
+        </li>
+        <li class="history-item">
+          <span class="history-vs">Vs chessmaster</span>
+          <span class="history-date">2025-06-04</span>
+          <span class="history-result lose">Lose</span>
+        </li>
+        <li class="history-item">
+          <span class="history-vs">Vs quick_move</span>
+          <span class="history-date">2025-06-02</span>
+          <span class="history-result draw">Draw</span>
+        </li>
+        <li class="history-item">
+          <span class="history-vs">Vs rag2504</span>
+          <span class="history-date">2025-05-31</span>
+          <span class="history-result win">Win</span>
+        </li>
+        <li class="history-item">
+          <span class="history-vs">Vs blitzking</span>
+          <span class="history-date">2025-05-29</span>
+          <span class="history-result lose">Lose</span>
+        </li>
+      </ul>
+    </div>
+    <!-- Wallet/Balance -->
+    <div class="section">
+      <div class="section-title">💰 Wallet</div>
+      <div class="wallet-balance" id="walletBalance">₹ 1,420</div>
+      <ul class="wallet-list" id="walletList">
+        <li class="wallet-item deposit">
+          <span>Deposit</span>
+          <span>+₹ 200</span>
+        </li>
+        <li class="wallet-item bonus">
+          <span>Bonus</span>
+          <span>+₹ 50</span>
+        </li>
+        <li class="wallet-item withdraw">
+          <span>Withdraw</span>
+          <span>-₹ 80</span>
+        </li>
+        <li class="wallet-item deposit">
+          <span>Deposit</span>
+          <span>+₹ 500</span>
+        </li>
+      </ul>
+    </div>
+    <!-- Contact & About -->
+    <div class="section" style="text-align:center;">
+      <div class="section-title" style="justify-content:center;">👤 About User</div>
+      <div style="font-size:1.05rem; opacity:.92; margin-bottom:6px;">
+        Hi, I'm Rag!<br>
+        Email: <a href="" style="color:#ffd93d;text-decoration:underline;">abc@example.com</a>
+      </div>
+      <div style="font-size:.97rem; opacity:.7; margin-bottom:8px;">
+        Chess Arena user since june 2025
+      </div>
+      <div>
+        <a href="mailto:abc@example.com" class="profile-btn" style="display:inline-block;margin-top:7px;">Contact Support</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Demo: If you want to dynamically set profile info, you could do so here.
+    function editProfile() {
+      alert("Profile editing coming soon!");
+    }
+    // (In real app: fetch and update stats, history, wallet dynamically here)
+  </script>
+</body>
+</html>

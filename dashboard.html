@@ -504,7 +504,72 @@ body {
     font-size: 0.9rem;
     opacity: 0.7;
 }
+/* My Profile Header Section Styles */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 18px;
+  padding: 18px 28px;
+  margin: 24px auto 0 auto;
+  max-width: 500px;
+  box-shadow: 0 4px 24px rgba(30, 60, 114, 0.14);
+  backdrop-filter: blur(10px);
+}
 
+.profile-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #667eea, #ffd93d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #222;
+  font-size: 2rem;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
+}
+
+.profile-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #ffd93d;
+}
+
+.profile-mobile {
+  font-size: 1rem;
+  color: #fff;
+  opacity: 0.85;
+  font-weight: 500;
+}
+
+.profile-edit-btn {
+  background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+  color: #222;
+  border: none;
+  border-radius: 16px;
+  padding: 8px 22px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.18s;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.13);
+}
+.profile-edit-btn:hover {
+  background: linear-gradient(45deg, #ffd93d, #ff6b6b);
+  transform: translateY(-2px) scale(1.03);
+}
 /* Mobile Responsive Design */
 @media (max-width: 768px) {
     .container {
@@ -967,6 +1032,15 @@ body {
             </div>
         </div>
     </div>
+    <!-- My Profile Header Section -->
+<div class="profile-header" id="profileHeader">
+  <div class="profile-avatar" id="profileAvatar">--</div>
+  <div class="profile-details">
+    <div class="profile-title">My Profile</div>
+    <div class="profile-mobile" id="profileMobile"></div>
+  </div>
+  <button class="profile-edit-btn" onclick="editProfile()">Edit</button>
+</div>
 
     <!-- Main Container -->
     <div class="container">
@@ -1160,6 +1234,24 @@ function filterPlayers(searchTerm) {
         player.mobile && player.mobile.toLowerCase().includes(searchTerm.toLowerCase())
     );
 }
+// JS for My Profile Header Section
+function getCurrentMobile() {
+    return localStorage.getItem('currentMobile') || '--';
+}
+function getInitials(mobile) {
+    if (!mobile || mobile.length < 2) return '--';
+    return mobile.slice(-2).toUpperCase();
+}
+function updateProfileHeader() {
+    const mobile = getCurrentMobile();
+    document.getElementById('profileMobile').textContent = mobile;
+    document.getElementById('profileAvatar').textContent = getInitials(mobile);
+}
+function editProfile() {
+    window.location.href = 'profile.html';
+}
+// Call this after DOMContentLoaded or directly if you add this section dynamically
+document.addEventListener('DOMContentLoaded', updateProfileHeader);
 
 function renderPlayers(players = allPlayers) {
     const listDiv = document.getElementById('playersList');

@@ -63,6 +63,10 @@
             position: relative;
         }
 
+        .password-group {
+            position: relative;
+        }
+
         label {
             display: block;
             margin-bottom: 8px;
@@ -91,6 +95,22 @@
             background: white;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 1.2rem;
+            user-select: none;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: #667eea;
         }
 
         button[type="submit"] {
@@ -254,11 +274,17 @@
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Create a password">
+                <div class="password-group">
+                    <input type="password" id="password" name="password" required placeholder="Create a password">
+                    <span class="password-toggle" onclick="togglePassword('password')">👁️</span>
+                </div>
             </div>
             <div class="form-group">
                 <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm your password">
+                <div class="password-group">
+                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm your password">
+                    <span class="password-toggle" onclick="togglePassword('confirmPassword')">👁️</span>
+                </div>
                 <div class="match-indicator" id="matchIndicator"></div>
             </div>
             <button type="submit">Create Account</button>
@@ -269,6 +295,19 @@
     </div>
 
     <script>
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const toggle = field.nextElementSibling;
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                toggle.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                toggle.textContent = '👁️';
+            }
+        }
+
         const passwordField = document.getElementById('password');
         const confirmPasswordField = document.getElementById('confirmPassword');
         const matchIndicator = document.getElementById('matchIndicator');
