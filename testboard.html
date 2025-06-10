@@ -10,8 +10,22 @@
   <script>
     var board = ChessBoard('board', {
       pieceTheme: '/img/chesspieces/wikipedia/{piece}.png',
-      position: 'start'
+      draggable: true,
+      position: 'start',
+      onDragStart: function (source, piece, position, orientation) {
+        // Do not allow white pieces to be dragged
+        if (piece.search(/^w/) !== -1) {
+          return false;
+        }
+      },
+      onDrop: function (source, target, piece, newPos, oldPos, orientation) {
+        // Do not allow moves if the piece is white
+        if (piece.search(/^w/) !== -1) {
+          return 'snapback';
+        }
+        
     });
+
   </script>
 </body>
 </html>
