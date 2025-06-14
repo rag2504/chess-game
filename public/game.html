@@ -135,6 +135,38 @@
                         body: JSON.stringify({ gameId, ...moveReq })
                     });
                     const data = await response.json();
+                    if (data.error) {
+                        document.getElementById('status').textContent = data.error;
+                        return 'snapback';
+                    }
+                    // If move was not successful, show error and legal moves
+                    if (data.legalMoves) {
+                        let msg = "Wrong move!<br>";
+                        msg += "<span class='legal-move-list'>Legal moves for this piece: " + 
+                            data.legalMoves.map(m => m.to).join(', ') + "</span>";
+                        document.getElementById('status').innerHTML = msg;
+                        return 'snapback';
+                    }
+                    // If move was successful, update chess.js and board
+                    if (!data.fen) {
+                        document.getElementById('status').textContent = 'Error: No FEN returned from server.';
+                        return 'snapback';
+                    }
+                    if (typeof data.fen !== "string" || data.fen.trim().split(" ").length < 4) {
+                        document.getElementById('status').textContent = 'Error: Invalid FEN returned from server.';
+                        return 'snapback';
+                    }
+                    
+                    // If move was successful, update chess.js and board
+                    chess.load(data.fen);
+                    board.position(data.fen);
+                    updateStatus(chess);
+                    // Emit the move to the server for real-time updates
+                    socket.emit('makeMove', { gameId, fen: data.fen });
+                    // Update status
+                    updateStatus(chess);
+                    // Return false to allow the move
+                    return false;
 
                     if (!data.success) {
                         // Show "Wrong move!" and legal moves for piece

@@ -2,9 +2,85 @@
 <html>
 <head>
   <link rel="stylesheet" href="/chessboard-1.0.0.min.css">
+  <style>
+    .board {
+      width: 400px;
+      height: 400px;
+      margin: 20px auto;
+    }
+    .board .square {
+      width: 50px;
+      height: 50px;
+    }
+    .board .square.white {
+      background-color: #eee;
+    } 
+    .board .square.black {
+      background-color: #333;
+    }
+    .board .piece {
+      width: 50px;
+      height: 50px;
+      background-size: cover;
+    }
+    .board .piece.wPawn { background-image: url('/img/chesspieces/wikipedia/wp.png'); }
+    .board .piece.bPawn { background-image: url('/img/chesspieces/wikipedia/bp.png'); }
+    .board .piece.wKnight { background-image: url('/img/chesspieces/wikipedia/wn.png'); }
+    .board .piece.bKnight { background-image: url('/img/chesspieces/wikipedia/bn.png'); }
+    .board .piece.wBishop { background-image: url('/img/chesspieces/wikipedia/wb.png'); }
+    .board .piece.bBishop { background-image: url('/img/chesspieces/wikipedia/bb.png'); }
+    .board .piece.wRook { background-image: url('/img/chesspieces/wikipedia/wr.png'); }
+    .board .piece.bRook { background-image: url('/img/chesspieces/wikipedia/br.png'); }
+    .board .piece.wQueen { background-image: url('/img/chesspieces/wikipedia/wq.png'); }
+    .board .piece.bQueen { background-image: url('/img/chesspieces/wikipedia/bq.png'); }
+    .board .piece.wKing { background-image: url('/img/chesspieces/wikipedia/wk.png'); }
+    .board .piece.bKing { background-image: url('/img/chesspieces/wikipedia/bk.png'); }
+    .board .square.highlight {
+      background-color: yellow;
+    }
+    .board .square.highlighted {
+      background-color: lightblue;
+    }
+    .board .square.selected {
+      background-color: orange;
+    }
+    .board .square.selected.highlighted {
+      background-color: red;
+    }
+    .board .square.selected.highlighted.highlight {
+      background-color: green;
+    }
+    .board .square.selected.highlighted.highlighted {
+      background-color: purple;
+    }
+    .board .square.selected.highlighted.highlighted.highlight {
+      background-color: pink;
+    }
+    .board .square.selected.highlighted.highlighted.highlighted {
+      background-color: cyan;
+    }
+    .board .square.selected.highlighted.highlighted.highlighted.highlight {
+      background-color: magenta;
+    }
+    .board .square.selected.highlighted.highlighted.highlighted.highlighted {
+      background-color: lime;
+    }
+    .board .square.selected.highlighted.highlighted.highlighted.highlighted.highlight {
+      background-color: teal;
+    }
+    .board .square.selected.highlighted.highlighted.highlighted.highlighted.highlighted {
+      background-color: olive;
+    }
+  </style>
 </head>
 <body>
   <div id="board" style="width: 400px"></div>
+  <h2>Chessboard Test</h2>
+  <p>This is a test page for the chessboard.js library. It allows you to drag and drop pieces, but only black pieces can be moved.</p>
+  <p>White pieces cannot be dragged or moved.</p>
+  <p>Try dragging a black piece to a valid square.</p>
+  <p>White pieces will snap back to their original position if you try to drag them.</p>
+  <p>Black pieces can be moved freely.</p>
   <script src="/jquery-3.6.0.min.js"></script>
   <script src="/chessboard-1.0.0.min.js"></script>
   <script>
