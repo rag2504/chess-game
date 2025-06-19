@@ -79,6 +79,19 @@
   <p>Click on a black piece to select it, and then click on a valid square to move it.</p>
   <p>Click on a white piece to see that it cannot be moved.</p>
   <p>Use the buttons below to reset the board or change the orientation.</p>
+  <button id="reset">Reset Board</button>
+  <button id="flip">Flip Board</button>
+  <script>
+    document.getElementById('reset').addEventListener('click', function() {
+      board.start();
+    });
+
+    document.getElementById('flip').addEventListener('click', function() {
+      board.flip();
+    });
+  </script>
+  <br>
+
 
   <script src="/jquery-3.6.0.min.js"></script>
   <script src="/chessboard-1.0.0.min.js"></script>
