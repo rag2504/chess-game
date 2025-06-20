@@ -11,8 +11,13 @@
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 10px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .container {
+            width: 100%;
             max-width: 100%;
             margin: 10px auto;
             padding: 15px;
@@ -21,19 +26,122 @@
             box-shadow: 0 0 14px #0009;
         }
         
-        /* Responsive breakpoints */
-        @media (min-width: 768px) {
+        /* Mobile styles */
+        @media (max-width: 767px) {
+            body {
+                align-items: flex-start;
+                padding: 5px;
+            }
             .container {
-                max-width: 90vw;
-                padding: 25px 30px 35px 30px;
-                margin: 20px auto;
+                margin: 5px auto;
+                padding: 10px;
+            }
+            .chess-board {
+                width: min(95vw, 95vh);
+                height: min(95vw, 95vh);
+                max-width: 400px;
+                max-height: 400px;
+            }
+            .square {
+                font-size: clamp(1.8rem, 4.5vw, 3rem);
             }
         }
         
-        @media (min-width: 1024px) {
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            .chess-board {
+                width: min(90vw, 85vh);
+                height: min(90vw, 85vh);
+                max-width: 350px;
+                max-height: 350px;
+            }
+            .square {
+                font-size: clamp(1.5rem, 4vw, 2.5rem);
+            }
+        }
+        
+        /* Tablet styles */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            body {
+                padding: 15px;
+            }
             .container {
-                max-width: min(95vw, 800px);
-                margin: 40px auto;
+                max-width: 600px;
+                padding: 25px 30px 35px 30px;
+                margin: 20px auto;
+            }
+            .chess-board {
+                width: 500px;
+                height: 500px;
+            }
+            .square {
+                font-size: 3rem;
+            }
+        }
+        
+        /* Desktop styles - Improved for better PC viewing */
+        @media (min-width: 1024px) {
+            body {
+                padding: 20px;
+            }
+            .container {
+                max-width: 720px;
+                margin: 30px auto;
+                padding: 35px;
+            }
+            .chess-board {
+                width: 600px;
+                height: 600px;
+                max-width: none;
+                max-height: none;
+            }
+            .square {
+                font-size: 3.8rem;
+            }
+        }
+        
+        /* Large desktop styles */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 800px;
+                padding: 40px;
+            }
+            .chess-board {
+                width: 680px;
+                height: 680px;
+            }
+            .square {
+                font-size: 4.2rem;
+            }
+        }
+        
+        /* Extra large desktop styles */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 900px;
+                padding: 45px;
+            }
+            .chess-board {
+                width: 760px;
+                height: 760px;
+            }
+            .square {
+                font-size: 4.6rem;
+            }
+        }
+        
+        /* Ultra-wide screens */
+        @media (min-width: 1920px) {
+            .container {
+                max-width: 1000px;
+                padding: 50px;
+            }
+            .chess-board {
+                width: 840px;
+                height: 840px;
+            }
+            .square {
+                font-size: 5rem;
             }
         }
 
@@ -61,12 +169,22 @@
         @media (min-width: 768px) {
             .player {
                 font-size: 1.13em;
-                padding: 8px 18px;
+                padding: 10px 20px;
                 flex: none;
                 white-space: normal;
             }
             .player-info {
-                margin-bottom: 18px;
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .player {
+                font-size: 1.2em;
+                padding: 12px 24px;
+            }
+            .player-info {
+                margin-bottom: 25px;
             }
         }
         
@@ -80,10 +198,6 @@
         .black { color: #ffd600; }
 
         .chess-board {
-            width: min(95vw, 95vh);
-            height: min(95vw, 95vh);
-            max-width: 700px;
-            max-height: 700px;
             margin: 0 auto 15px auto;
             border: 3px solid #444;
             border-radius: 8px;
@@ -97,6 +211,15 @@
         @media (min-width: 768px) {
             .chess-board {
                 margin: 0 auto 20px auto;
+                border-width: 4px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .chess-board {
+                margin: 0 auto 25px auto;
+                border-width: 5px;
+                border-radius: 12px;
             }
         }
 
@@ -104,18 +227,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(2rem, 5vw, 3.5rem);
             cursor: pointer;
             position: relative;
             transition: all 0.2s ease;
             user-select: none;
             aspect-ratio: 1;
-        }
-        
-        @media (min-width: 768px) {
-            .square {
-                font-size: clamp(2.5rem, 4vw, 4rem);
-            }
         }
 
         .square.light {
@@ -196,10 +312,19 @@
         
         @media (min-width: 768px) {
             #status {
-                margin-top: 18px;
+                margin-top: 20px;
                 font-size: 1.15em;
                 min-height: 2.5em;
                 padding: 12px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            #status {
+                margin-top: 25px;
+                font-size: 1.25em;
+                min-height: 3em;
+                padding: 15px;
             }
         }
 
@@ -236,7 +361,14 @@
         @media (min-width: 768px) {
             #connection-status {
                 font-size: 0.9em;
-                margin-top: 10px;
+                margin-top: 12px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            #connection-status {
+                font-size: 1em;
+                margin-top: 15px;
             }
         }
 
@@ -261,52 +393,21 @@
                 margin: 22px auto 0 auto;
                 font-size: 1.06em;
                 width: auto;
+                padding: 12px 24px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .return-btn {
+                margin: 25px auto 0 auto;
+                font-size: 1.1em;
+                padding: 14px 28px;
             }
         }
 
         .return-btn:hover {
             background: #1565c0;
             transform: translateY(-1px);
-        }
-        
-        /* Ensure board stays centered and sized properly on all devices */
-        @media (max-width: 480px) {
-            body {
-                padding: 5px;
-            }
-            .container {
-                padding: 10px;
-                margin: 5px auto;
-            }
-            .chess-board {
-                width: min(95vw, 95vh);
-                height: min(95vw, 95vh);
-            }
-        }
-        
-        /* Large desktop screens */
-        @media (min-width: 1400px) {
-            .chess-board {
-                max-width: 800px;
-                max-height: 800px;
-            }
-            .square {
-                font-size: 4.5rem;
-            }
-        }
-        
-        /* Ultra-wide screens */
-        @media (min-width: 1920px) {
-            .container {
-                max-width: 1000px;
-            }
-            .chess-board {
-                max-width: 900px;
-                max-height: 900px;
-            }
-            .square {
-                font-size: 5rem;
-            }
         }
     </style>
 </head>

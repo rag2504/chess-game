@@ -89,6 +89,29 @@
     document.getElementById('flip').addEventListener('click', function() {
       board.flip();
     });
+    document.getElementById('board').addEventListener('click', function(event) {
+      var square = event.target;
+      if (square.classList.contains('square')) {
+        square.classList.toggle('selected');
+      }
+    });
+    var board = new Chessboard('board', {
+      orientation: 'white',
+      draggable: true,
+      position: 'start',
+      onDragStart: function (source, piece, position, orientation) {
+        // Do not allow white pieces to be dragged
+        if (piece.search(/^w/) !== -1) {
+          return false;
+        }
+      },
+      onDrop: function (source, target, piece, newPos, oldPos, orientation) {
+        // Do not allow moves if the piece is white
+        if (piece.search(/^w/) !== -1) {
+          return 'snapback';
+        }
+      }
+    });
   </script>
   <br>
 
